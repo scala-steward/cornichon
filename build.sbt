@@ -120,6 +120,7 @@ lazy val testFramework =
         library.classgraph,
         library.decline,
         library.scalaXml,
+        library.munit % Test,
         library.scalacheck % Test,
         library.http4sServer % Test,
         library.http4sCirce % Test,
@@ -265,7 +266,7 @@ lazy val library =
       val sbtTest = "1.0"
       val http4s = "0.23.38"
       val fs2 = "3.14.0"
-      val classgraph = "4.8.199"
+      val classgraph = "5.0.1"
       val decline = "2.6.2"
       val scalaXml = "2.5.0"
       val typesafeConfig = "1.4.9"

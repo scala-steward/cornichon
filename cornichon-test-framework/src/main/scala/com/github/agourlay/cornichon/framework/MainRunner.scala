@@ -92,16 +92,18 @@ object MainRunner {
 
   // `CornichonFeature` is a trait, so on the JVM it is an interface - `getSubclasses` finds nothing here.
   // `getStandardClasses` drops interfaces and annotations, leaving the concrete features once abstract ones are filtered out.
-  private def discoverFeatureClasses(packageToExplore: String): List[Class[?]] = {
-    val scanResult = new ClassGraph().enableClassInfo().acceptPackages(packageToExplore).scan()
+  // ClassGraph 5+ no longer loads classes, so they are loaded here through the context class loader.
+  private[framework] def discoverFeatureClasses(packageToExplore: String): List[Class[?]] = {
+    val classLoader = Thread.currentThread().getContextClassLoader
+    val scanResult = new ClassGraph().enableClasspath().enableClassInfo().acceptPackages(packageToExplore).scan()
     try
       scanResult
-        .getClassesImplementing(classOf[CornichonFeature].getName)
+        .getAllClassesImplementing(classOf[CornichonFeature].getName)
         .getStandardClasses
         .asScala
         .iterator
         .filterNot(_.isAbstract)
-        .map(_.loadClass())
+        .map(classInfo => Class.forName(classInfo.getName, false, classLoader))
         .toList
     finally scanResult.close()
   }
